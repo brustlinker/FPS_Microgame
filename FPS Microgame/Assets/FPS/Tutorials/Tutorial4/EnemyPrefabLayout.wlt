@@ -427,7 +427,7 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/FPS/Prefabs/Enemies
   m_LastFoldersGridSize: 96
-  m_LastProjectPath: D:\learnU\FPS Microgame
+  m_LastProjectPath: G:\U3d\FPS_Microgame\FPS Microgame
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
