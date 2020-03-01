@@ -427,7 +427,7 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/FPS/Prefabs/Level/Rooms
   m_LastFoldersGridSize: 96
-  m_LastProjectPath: D:\learnU\FPS_Microgame\FPS Microgame
+  m_LastProjectPath: E:\unityproj2\FPS_Microgame\FPS Microgame
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:

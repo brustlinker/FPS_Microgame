@@ -4,16 +4,16 @@ using UnityEngine.Events;
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class Pickup : MonoBehaviour
 {
-    [Tooltip("Frequency at which the item will move up and down")]
+    [Tooltip("上下移动的频率")]
     public float verticalBobFrequency = 1f;
-    [Tooltip("Distance the item will move up and down")]
+    [Tooltip("上下移动的距离")]
     public float bobbingAmount = 1f;
-    [Tooltip("Rotation angle per second")]
+    [Tooltip("每秒的旋转速度")]
     public float rotatingSpeed = 360f;
 
-    [Tooltip("Sound played on pickup")]
+    [Tooltip("拾取时的音效")]
     public AudioClip pickupSFX;
-    [Tooltip("VFX spawned on pickup")]
+    [Tooltip("VFX 生成的")]
     public GameObject pickupVFXPrefab;
 
     public UnityAction<PlayerCharacterController> onPick;
@@ -40,6 +40,7 @@ public class Pickup : MonoBehaviour
 
     private void Update()
     {
+        
         // Handle bobbing
         float bobbingAnimationPhase = ((Mathf.Sin(Time.time * verticalBobFrequency) * 0.5f) + 0.5f) * bobbingAmount;
         transform.position = m_StartPosition + Vector3.up * bobbingAnimationPhase;
