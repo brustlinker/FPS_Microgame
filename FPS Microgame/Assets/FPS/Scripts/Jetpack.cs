@@ -84,7 +84,7 @@ public class Jetpack : MonoBehaviour
             float totalAcceleration = jetpackAcceleration;
 
             // cancel out gravity
-            totalAcceleration += m_PlayerCharacterController.gravityDownForce;
+            totalAcceleration += m_PlayerCharacterController.重力;
 
             if (m_PlayerCharacterController.characterVelocity.y < 0f)
             {

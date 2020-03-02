@@ -4,21 +4,21 @@ using UnityEngine.Events;
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(AudioSource))]
 public class PlayerCharacterController : MonoBehaviour
 {
-    [Header("References")]
-    [Tooltip("Reference to the main camera used for the player")]
-    public Camera playerCamera;
-    [Tooltip("Audio source for footsteps, jump, etc...")]
+    [Header("引用")]
+    [Tooltip("玩家主camera")]
+    public Camera 玩家摄像机;
+    [Tooltip("Audio source for 走路, 跳跃, 等等...")]
     public AudioSource audioSource;
 
-    [Header("General")]
+    [Header("常用")]
     [Tooltip("Force applied downward when in the air")]
-    public float gravityDownForce = 20f;
+    public float 重力 = 20f;
     [Tooltip("Physic layers checked to consider the player grounded")]
     public LayerMask groundCheckLayers = -1;
     [Tooltip("distance from the bottom of the character controller capsule to test for grounded")]
     public float groundCheckDistance = 0.05f;
 
-    [Header("Movement")]
+    [Header("移动")]
     [Tooltip("Max movement speed when grounded (when not sprinting)")]
     public float maxSpeedOnGround = 10f;
     [Tooltip("Sharpness for the movement when grounded, a low value will make the player accelerate and decelerate slowly, a high value will do the opposite")]
@@ -35,28 +35,28 @@ public class PlayerCharacterController : MonoBehaviour
     [Tooltip("Height at which the player dies instantly when falling off the map")]
     public float killHeight = -50f;
 
-    [Header("Rotation")]
+    [Header("旋转")]
     [Tooltip("Rotation speed for moving the camera")]
     public float rotationSpeed = 200f;
     [Range(0.1f, 1f)]
     [Tooltip("Rotation speed multiplier when aiming")]
     public float aimingRotationMultiplier = 0.4f;
 
-    [Header("Jump")]
+    [Header("跳跃")]
     [Tooltip("Force applied upward when jumping")]
     public float jumpForce = 9f;
 
-    [Header("Stance")]
+    [Header("站立")]
     [Tooltip("Ratio (0-1) of the character height where the camera will be at")]
     public float cameraHeightRatio = 0.9f;
-    [Tooltip("Height of character when standing")]
+    [Tooltip("站立时角色高度")]
     public float capsuleHeightStanding = 1.8f;
-    [Tooltip("Height of character when crouching")]
+    [Tooltip("蹲下时角色高度")]
     public float capsuleHeightCrouching = 0.9f;
-    [Tooltip("Speed of crouching transitions")]
+    [Tooltip("蹲下时的移动速度")]
     public float crouchingSharpness = 10f;
 
-    [Header("Audio")]
+    [Header("声音")]
     [Tooltip("Amount of footstep sounds played when moving one meter")]
     public float footstepSFXFrequency = 1f;
     [Tooltip("Amount of footstep sounds played when moving one meter while sprinting")]
@@ -70,10 +70,10 @@ public class PlayerCharacterController : MonoBehaviour
     [Tooltip("Sound played when taking damage froma fall")]
     public AudioClip fallDamageSFX;
 
-    [Header("Fall Damage")]
-    [Tooltip("Whether the player will recieve damage when hitting the ground at high speed")]
-    public bool recievesFallDamage;
-    [Tooltip("Minimun fall speed for recieving fall damage")]
+    [Header("跌落伤害")]
+    [Tooltip("是否接受伤害 ，告诉撞倒地面的时候")]
+    public bool 是否接受跌落伤害;
+    [Tooltip("小于这个速度没有跌落伤害")]
     public float minSpeedForFallDamage = 10f;
     [Tooltip("Fall speed for recieving th emaximum amount of fall damage")]
     public float maxSpeedForFallDamage = 30f;
@@ -101,7 +101,10 @@ public class PlayerCharacterController : MonoBehaviour
             return 1f;
         }
     }
-        
+    
+    
+
+    //玩家的血量控制函数
     Health m_Health;
     PlayerInputHandler m_InputHandler;
     CharacterController m_Controller;
@@ -120,7 +123,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     void Start()
     {
-        // fetch components on the same gameObject
+        //拿到组件
         m_Controller = GetComponent<CharacterController>();
         DebugUtility.HandleErrorIfNullGetComponent<CharacterController, PlayerCharacterController>(m_Controller, this, gameObject);
 
@@ -147,7 +150,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     void Update()
     {
-        // check for Y kill
+        // check for Y kill，
+        //超过一定的高度就直接杀死
         if(!isDead && transform.position.y < killHeight)
         {
             m_Health.Kill();
@@ -155,26 +159,30 @@ public class PlayerCharacterController : MonoBehaviour
 
         hasJumpedThisFrame = false;
 
+
+        //落地检查，
         bool wasGrounded = isGrounded;
         GroundCheck();
 
-        // landing
+        // 是否落地
         if (isGrounded && !wasGrounded)
         {
             // Fall damage
             float fallSpeed = -Mathf.Min(characterVelocity.y, m_LatestImpactSpeed.y);
             float fallSpeedRatio = (fallSpeed - minSpeedForFallDamage) / (maxSpeedForFallDamage - minSpeedForFallDamage);
-            if (recievesFallDamage && fallSpeedRatio > 0f)
+            if (是否接受跌落伤害 && fallSpeedRatio > 0f)
             {
+                //伤害的插值
                 float dmgFromFall = Mathf.Lerp(fallDamageAtMinSpeed, fallDamageAtMaxSpeed, fallSpeedRatio);
                 m_Health.TakeDamage(dmgFromFall, null);
 
-                // fall damage SFX
+                // 坠落伤害的音效 SFX
                 audioSource.PlayOneShot(fallDamageSFX);
             }
             else
             {
                 // land SFX
+                //着陆的音效
                 audioSource.PlayOneShot(landSFX);
             }
         }
@@ -185,8 +193,11 @@ public class PlayerCharacterController : MonoBehaviour
             SetCrouchingState(!isCrouching, false);
         }
 
+        //跟新玩家的高度，推测蹲下和站立的时候碰撞器大小不一样
         UpdateCharacterHeight(false);
 
+
+        //控制玩家的移动
         HandleCharacterMovement();
     }
 
@@ -233,15 +244,19 @@ public class PlayerCharacterController : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// 处理玩家的移动
+    /// </summary>
     void HandleCharacterMovement()
     {
-        // horizontal character rotation
+        // 水平旋转
         {
             // rotate the transform with the input speed around its local Y axis
             transform.Rotate(new Vector3(0f, (m_InputHandler.GetLookInputsHorizontal() * rotationSpeed * RotationMultiplier), 0f), Space.Self);
         }
 
-        // vertical camera rotation
+        // 垂直相机翻转
         {
             // add vertical inputs to the camera's vertical angle
             m_CameraVerticalAngle += m_InputHandler.GetLookInputsVertical() * rotationSpeed * RotationMultiplier;
@@ -250,7 +265,7 @@ public class PlayerCharacterController : MonoBehaviour
             m_CameraVerticalAngle = Mathf.Clamp(m_CameraVerticalAngle, -89f, 89f);
 
             // apply the vertical angle as a local rotation to the camera transform along its right axis (makes it pivot up and down)
-            playerCamera.transform.localEulerAngles = new Vector3(m_CameraVerticalAngle, 0, 0);
+            玩家摄像机.transform.localEulerAngles = new Vector3(m_CameraVerticalAngle, 0, 0);
         }
 
         // character movement handling
@@ -328,7 +343,7 @@ public class PlayerCharacterController : MonoBehaviour
                 characterVelocity = horizontalVelocity + (Vector3.up * verticalVelocity);
 
                 // apply the gravity to the velocity
-                characterVelocity += Vector3.down * gravityDownForce * Time.deltaTime;
+                characterVelocity += Vector3.down * 重力 * Time.deltaTime;
             }
         }
 
@@ -380,7 +395,7 @@ public class PlayerCharacterController : MonoBehaviour
         {
             m_Controller.height = m_TargetCharacterHeight;
             m_Controller.center = Vector3.up * m_Controller.height * 0.5f;
-            playerCamera.transform.localPosition = Vector3.up * m_TargetCharacterHeight * cameraHeightRatio;
+            玩家摄像机.transform.localPosition = Vector3.up * m_TargetCharacterHeight * cameraHeightRatio;
             m_Actor.aimPoint.transform.localPosition = m_Controller.center;
         }
         // Update smooth height
@@ -389,7 +404,7 @@ public class PlayerCharacterController : MonoBehaviour
             // resize the capsule and adjust camera position
             m_Controller.height = Mathf.Lerp(m_Controller.height, m_TargetCharacterHeight, crouchingSharpness * Time.deltaTime);
             m_Controller.center = Vector3.up * m_Controller.height * 0.5f;
-            playerCamera.transform.localPosition = Vector3.Lerp(playerCamera.transform.localPosition, Vector3.up * m_TargetCharacterHeight * cameraHeightRatio, crouchingSharpness * Time.deltaTime);
+            玩家摄像机.transform.localPosition = Vector3.Lerp(玩家摄像机.transform.localPosition, Vector3.up * m_TargetCharacterHeight * cameraHeightRatio, crouchingSharpness * Time.deltaTime);
             m_Actor.aimPoint.transform.localPosition = m_Controller.center;
         }
     }

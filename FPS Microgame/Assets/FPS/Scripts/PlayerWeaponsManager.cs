@@ -178,7 +178,7 @@ public class PlayerWeaponsManager : MonoBehaviour
     // Sets the FOV of the main camera and the weapon camera simultaneously
     public void SetFOV(float fov)
     {
-        m_PlayerCharacterController.playerCamera.fieldOfView = fov;
+        m_PlayerCharacterController.玩家摄像机.fieldOfView = fov;
         weaponCamera.fieldOfView = fov * weaponFOVMultiplier;
     }
 
@@ -260,12 +260,12 @@ public class PlayerWeaponsManager : MonoBehaviour
             if (isAiming && activeWeapon)
             {
                 m_WeaponMainLocalPosition = Vector3.Lerp(m_WeaponMainLocalPosition, aimingWeaponPosition.localPosition + activeWeapon.aimOffset, aimingAnimationSpeed * Time.deltaTime);
-                SetFOV(Mathf.Lerp(m_PlayerCharacterController.playerCamera.fieldOfView, activeWeapon.aimZoomRatio * defaultFOV, aimingAnimationSpeed * Time.deltaTime));
+                SetFOV(Mathf.Lerp(m_PlayerCharacterController.玩家摄像机.fieldOfView, activeWeapon.aimZoomRatio * defaultFOV, aimingAnimationSpeed * Time.deltaTime));
             }
             else
             {
                 m_WeaponMainLocalPosition = Vector3.Lerp(m_WeaponMainLocalPosition, defaultWeaponPosition.localPosition, aimingAnimationSpeed * Time.deltaTime);
-                SetFOV(Mathf.Lerp(m_PlayerCharacterController.playerCamera.fieldOfView, defaultFOV, aimingAnimationSpeed * Time.deltaTime));
+                SetFOV(Mathf.Lerp(m_PlayerCharacterController.玩家摄像机.fieldOfView, defaultFOV, aimingAnimationSpeed * Time.deltaTime));
             }
         }
     }

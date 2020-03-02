@@ -2,15 +2,15 @@
 
 public class PlayerInputHandler : MonoBehaviour
 {
-    [Tooltip("Sensitivity multiplier for moving the camera around")]
+    [Tooltip("Sensitivity multiplier ，对于移动镜头")]
     public float lookSensitivity = 1f;
-    [Tooltip("Additional sensitivity multiplier for WebGL")]
+    [Tooltip("附加 sensitivity multiplier针对WebGL平台")]
     public float webglLookSensitivityMultiplier = 0.25f;
     [Tooltip("Limit to consider an input when using a trigger on a controller")]
-    public float triggerAxisThreshold = 0.4f;
-    [Tooltip("Used to flip the vertical input axis")]
+    public float triggerAxis阈值 = 0.4f;
+    [Tooltip("是否翻转vertical input axis")]
     public bool invertYAxis = false;
-    [Tooltip("Used to flip the horizontal input axis")]
+    [Tooltip("是否翻转horizontal input axis")]
     public bool invertXAxis = false;
 
     GameFlowManager m_GameFlowManager;
@@ -100,7 +100,7 @@ public class PlayerInputHandler : MonoBehaviour
             bool isGamepad = Input.GetAxis(GameConstants.k_ButtonNameGamepadFire) != 0f;
             if (isGamepad)
             {
-                return Input.GetAxis(GameConstants.k_ButtonNameGamepadFire) >= triggerAxisThreshold;
+                return Input.GetAxis(GameConstants.k_ButtonNameGamepadFire) >= triggerAxis阈值;
             }
             else
             {
